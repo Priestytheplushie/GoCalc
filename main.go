@@ -10,20 +10,30 @@ import (
 	"strings"
 )
 
+const (
+	Reset  = "\033[0m"
+	Green  = "\033[32m"
+	Cyan   = "\033[36m"
+	Yellow = "\033[33m"
+	Red    = "\033[31m"
+)
+
 func main() {
 	fmt.Println("Welcome to GoCalc")
 	fmt.Println("-----------------------------------------")
 	fmt.Println("Binary ops (e.g., 5 + 3, 2 ^ 3, 10 % 3): +, -, *, /, ^, %")
 	fmt.Println("Unary ops  (e.g., sqrt 16, abs -5, sin 90): sqrt, abs, sin, cos, tan")
+	fmt.Println("Memory:     Type 'ans' to use your last result")
 	fmt.Println("Type 'exit' to quit")
 
 	scanner := bufio.NewScanner(os.Stdin)
+	var lastResult float64 = 0
 
-	binaryRegex := regexp.MustCompile(`^\s*([+-]?\d*\.?\d+)\s*([\+\-\*\/\^\%])\s*([+-]?\d*\.?\d+)\s*$`)
-	unaryRegex := regexp.MustCompile(`^\s*([a-zA-Z]+)\s+([+-]?\d*\.?\d+)\s*$`)
+	binaryRegex := regexp.MustCompile(`^\s*([+-]?\d*\.?\d+|ans)\s*([\+\-\*\/\^\%])\s*([+-]?\d*\.?\d+|ans)\s*$`)
+	unaryRegex := regexp.MustCompile(`^\s*([a-zA-Z]+)\s+([+-]?\d*\.?\d+|ans)\s*$`)
 
 	for {
-		fmt.Print("\n<GoCalc> ")
+		fmt.Print(Yellow + "\n<GoCalc> " + Reset)
 		
 		if !scanner.Scan() {
 			break
@@ -31,7 +41,7 @@ func main() {
 		input := strings.TrimSpace(scanner.Text())
 
 		if strings.ToLower(input) == "exit" || strings.ToLower(input) == "quit" {
-			fmt.Println("Exiting...")
+			fmt.Println(Cyan + "Exiting... Goodbye!" + Reset)
 			break
 		}
 
@@ -39,11 +49,18 @@ func main() {
 			continue
 		}
 
+		parseVal := func(s string) (float64, error) {
+			if strings.ToLower(s) == "ans" {
+				return lastResult, nil
+			}
+			return strconv.ParseFloat(s, 64)
+		}
+
 		if unaryMatches := unaryRegex.FindStringSubmatch(input); unaryMatches != nil {
 			fn := strings.ToLower(unaryMatches[1])
-			val, err := strconv.ParseFloat(unaryMatches[2], 64)
+			val, err := parseVal(unaryMatches[2])
 			if err != nil {
-				fmt.Println("Error: Invalid number provided.")
+				fmt.Println(Red + "Error: Invalid number provided." + Reset)
 				continue
 			}
 
@@ -70,25 +87,26 @@ func main() {
 			}
 
 			if uErr != nil {
-				fmt.Printf("Error: %v\n", uErr)
+				fmt.Println(Red + "Error: " + uErr.Error() + Reset)
 			} else {
-				fmt.Printf("Result: %g\n", res)
+				lastResult = res
+				fmt.Printf(Green+"Result: %g\n"+Reset, res)
 			}
 			continue
 		}
 
 		binaryMatches := binaryRegex.FindStringSubmatch(input)
 		if binaryMatches == nil {
-			fmt.Println("Error: Invalid format. Try '5 + 3', '2 ^ 3', or 'sqrt 16'")
+			fmt.Println(Red + "Error: Invalid format. Try '5 + 3', 'ans * 2', or 'sqrt 16'" + Reset)
 			continue
 		}
 
-		num1, err1 := strconv.ParseFloat(binaryMatches[1], 64)
+		num1, err1 := parseVal(binaryMatches[1])
 		operator := binaryMatches[2]
-		num2, err2 := strconv.ParseFloat(binaryMatches[3], 64)
+		num2, err2 := parseVal(binaryMatches[3])
 
 		if err1 != nil || err2 != nil {
-			fmt.Println("Error: Invalid numbers provided.")
+			fmt.Println(Red + "Error: Invalid numbers provided." + Reset)
 			continue
 		}
 
@@ -117,9 +135,10 @@ func main() {
 		}
 
 		if calcErr != nil {
-			fmt.Printf("Error: %v\n", calcErr)
+			fmt.Println(Red + "Error: " + calcErr.Error() + Reset)
 		} else {
-			fmt.Printf("Result: %g\n", result)
+			lastResult = result
+			fmt.Printf(Green+"Result: %g\n"+Reset, result)
 		}
 	}
 }
