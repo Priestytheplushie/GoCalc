@@ -98,7 +98,7 @@ Probability: 30% (Odds: 3 out of 10)
 ```
 
 > [!WARNING]
-> Statistics and probability features are still lightly tested, so double-check important results.
+> Statistics and probability features are still lightly tested, so double-check important results, and by lightly tested, I mean I just ran 1 test for the README.md, so be careful before using
 
 ## Development 
 This project was again, made for a school weekened project, and as such will not be maintained, it's also pretty lame, I orignally wanted to make a Go PumpkinMC plugin, but the Go Docs were outdated, and I hit strange compiler errors, so I made this thing instead. Have fun ig
