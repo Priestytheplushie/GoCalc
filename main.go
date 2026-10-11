@@ -42,7 +42,7 @@ func main() {
 	fmt.Println("             npr [n] [r]     (Permutations)")
 	fmt.Println("             prob [fav] [tot] (Success odds percentage)")
 	fmt.Println("Memory:      Type 'ans' to use your last result")
-	fmt.Println("Type 'exit' to quit")
+	fmt.Println("Type 'exit' or 'quit' to quit")
 	fmt.Println("-----------------------------------------")
 
 	scanner := bufio.NewScanner(os.Stdin)
